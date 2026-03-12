@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sapiens Marketing â DiÃ¡rio de Leads</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+/* âââ TOKENS âââââââââââââââââââââââââââââââââââââââ */
+:root {
+  --bg:      #07070e;
+  --s1:      #0d0d18;
+  --s2:      #13131f;
+  --s3:      #1a1a2a;
+  --border:  #222235;
+  --border2: #2c2c44;
+  --a:       #6f63f5;
+  --a-dim:   rgba(111,99,245,.13);
+  --a-glow:  rgba(111,99,245,.35);
+  --green:   #00c896;
+  --yellow:  #f5c54a;
+  --red:     #f05050;
+  --blue:    #4ab3f5;
+  --text:    #e2e2ee;
+  --muted:   #5a5a72;
+  --muted2:  #35354e;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:var(--s1);}
+::-webkit-scrollbar-thumb{background:var(--muted2);border-radius:4px;}
+
+/* âââ LAYOUT ââââââââââââââââââââââââââââââââââââââ */
+.app{display:flex;min-height:100vh;}
+
+/* âââ SIDEBAR ââââââââââââââââââââââââââââââââââââââ */
+.sidebar{
+  width:210px;min-width:210px;background:var(--s1);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.logo-wrap{padding:22px 18px 16px;border-bottom:1px solid var(--border);}
+.brand{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:-.5px;}
+.brand em{color:var(--a);font-style:normal;}
+.brand-sub{font-size:9px;color:var(--muted);margin-top:2px;letter-spacing:.5px;}
+
+.sb-section{padding:14px 16px 6px;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;}
+.nav-item{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 14px;cursor:pointer;font-size:11px;
+  color:var(--muted);border-left:2px solid transparent;
+  transition:all .15s;margin:1px 4px 1px 0;border-radius:0 5px 5px 0;
+}
+.nav-item:hover{color:var(--text);background:var(--s2);}
+.nav-item.active{color:var(--a);border-left-color:var(--a);background:var(--a-dim);}
+.nav-item .ico{width:16px;text-align:center;font-size:13px;}
+.nav-item .badge{margin-left:auto;font-size:9px;color:var(--muted2);background:var(--s3);padding:1px 6px;border-radius:10px;}
+.sb-divider{height:1px;background:var(--border);margin:6px 14px;}2);
+  padding:2px 7px;border-radius:3px;font-size:11px;color:var(--blue);
+}
+.input-row{display:flex;gap:8px;margin-top:10px;}
+.input-row input{
+  flex:1;background:var(--s2);border:1px solid var(--border2);
+  color:var(--text);font-family:'DM Mono',monospace;font-size:12px;
+  padding:9px 12px;border-radius:5px;outline:none;transition:border .15s;
+}
+.input-row input:focus{border-color:var(--a);}
+.setup-footer{padding:0 28px 28px;display:flex;gap:8px;}
+
+/* âââ MODAL ââââââââââââââââââââââââââââââââââââââââ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.overlay.open{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--border2);border-radius:12px;padding:26px;width:420px;max-width:95vw;box-shadow:0 24px 80px rgba(0,0,0,.6);}
+.modal h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px;}
+.modal .msub{font-size:11px;color:var(--muted);margin-bottom:18px;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px;}
+.fg{display:flex;flex-direction:column;gap:4px;}
+.fg.full{grid-column:1/-1;}
+.fg label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
+.fg input,.fg textarea{
+  background:var(--s2);border:1px solid var(--border2);color:var(--text);
+  font-family:'DM Mono',monospace;font-size:12px;
+  padding:8px 11px;border-radius:5px;outline:none;transition:border .15s;
+}
+.fg input:focus,.fg textarea:focus{border-color:var(--a);}
+.mactions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;}
+
+/* âââ TOAST ââââââââââââââââââââââââââââââââââââââââ */
+.toast{
+  position:fixed;bottom:22px;right:22px;
+  background:var(--s2);border:1px solid var(--border2);
+  color:var(--text);font-size:11px;padding:11px 18px;
+  border-radius:6px;z-index:999;
+  transform:translateY(8px);opacity:0;transition:all .25s;
+  display:flex;align-items:center;gap:8px;
+}
+.toast.ok{border-color:var(--green);color:var(--green);}
+.toast.err{border-color:var(--red);color:var(--red);}
+.toast.show{transform:translateY(0);opacity:1;}
+
+.empty{padding:36px;text-align:center;color:var(--muted);font-size:11px;line-height:2;}
+</style>
+</head>
+<body>
+<div class="app" id="app" style="display:none;">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="logo-wrap">
+    <div class="brand">SAPIENS<em>.</em>MKT</div>
+    <div class="brand-sub">EscritÃ³rio PrevidenciÃ¡rio</div>
+  </div>
+
+  <div class="sb-section">VisÃµes</div>
+  <div class="nav-item active" onclick="showPage('daily',this)"><span class="ico">â¦</span> DiÃ¡rio</div>
+  <div class="nav-item" onclick="showPage('weekly',this)"><span class="ico">â¤</span> Semanal</div>
+  <div class="nav-item" onclick="showPage('monthly',this)"><span class="ico">â</span> Mensal</div>
+
+  <div class="sb-divider"></div>
+  <div class="sb-section">Meses</div>
+  <div id="month-nav"></div>
+
+  <div class="sb-divider"></div>
+  <div class="sb-section">Sistema</div>
+  <div class="nav-item" onclick="exportCSV()"><span class="ico">â¬</span> Exportar CSV</div>
+  <div class="nav-item" onclick="openSettings()"><span class="ico">â</span> ConfiguraÃ§Ãµes</div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">DiÃ¡rio <span id="active-month-label"></span></div>
+    <div class="topbar-right">
+      <div class="status-pill" id="status-pill"><div class="status-dot"></div><span id="status-text">Conectando...</span></div>
+      <button class="btn btn-primary" onclick="openAddModal()">+ LanÃ§ar dia</button>
+    </div>
+  </div>
+
+  <!-- DAILY -->
+  <div id="page-daily" class="page active">
+    <div class="quick-bar" id="quick-bar">
+      <div class="qe-lbl">â¡ Hoje</div>
+      <div class="qe-field"><label>Invest. R$</label><input type="number" id="q-inv" step="0.01" placeholder="0.00" oninput="quickDebounce()"></div>
+      <div class="qe-field"><label>Leads FB</label><input type="number" id="q-leads" placeholder="0" oninput="quickDebounce()"></div>
+      <div class="qe-field"><label>Leads CRM</label><input type="number" id="q-crm" placeholder="0" oninput="quickDebounce()"></div>
+      <div class="qe-field"><label>R. Fechamento</label><input type="number" id="q-rfech" placeholder="0" oninput="quickDebounce()"></div>
+      <div class="qe-field"><label>Vendas</label><input type="number" id="q-vendas" placeholder="0" oninput="quickDebounce()"></div>
+      <div class="qe-field"><label>Ticket R$</label><input type="number" id="q-ticket" placeholder="0" oninput="quickDebounce()"></div>
+    </div>
+    <div class="kpi-row" id="daily-kpis"></div>
+    <div class="chart-row">
+      <div class="chart-box"><div class="chart-ttl">Leads por dia</div><canvas id="ch-leads" height="110"></canvas></div>
+      <div class="chart-box"><div class="chart-ttl">Investimento vs Valor Vendido</div><canvas id="ch-inv" height="110"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <span class="card-ttl" id="table-lbl"></span>
+        <button class="btn btn-sm" onclick="openAddModal()">+ Dia</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Data</th>
+            <th class="r">Invest.</th><th class="r">Leads FB</th><th class="r">CPL</th>
+            <th class="r">CRM</th><th class="r">R.Fech.</th><th class="r">Taxa</th>
+            <th class="r">Vendas</th><th class="r">Ticket</th>
+            <th class="r">Vl.Vendido</th><th class="r">ROAS</th><th class="r">CAC</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="daily-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEKLY -->
+  <div id="page-weekly" class="page">
+    <div class="kpi-row" id="weekly-kpis"></div>
+    <div class="week-grid" id="weekly-grid"></div>
+  </div>
+
+  <!-- MONTHLY -->
+  <div id="page-monthly" class="page">
+    <div class="kpi-row" id="monthly-kpis"></div>
+    <div class="chart-row">
+      <div class="chart-box"><div class="chart-ttl">ROAS por mÃªs</div><canvas id="ch-roas" height="110"></canvas></div>
+      <div class="chart-box"><div class="chart-ttl">Valor vendido por mÃªs</div><canvas id="ch-vv" height="110"></canvas></div>
+    </div>
+    <div class="month-grid" id="monthly-grid"></div>
+  </div>
+</div>
+</div>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen">
+  <div class="setup-screen">
+    <div class="setup-hd">
+      <h2>ConfiguraÃ§Ã£o inicial</h2>
+      <p>Siga os 3 passos abaixo para conectar o dashboard ao Google Sheets.<br>Leva menos de 10 minutos e sÃ³ precisa fazer uma vez.</p>
+    </div>
+    <div class="setup-body">
+
+      <div class="setup-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Criar a planilha no Google Sheets</h4>
+          <p>Acesse <a href="https://sheets.google.com" target="_blank">sheets.google.com</a> e crie uma planilha nova.<br>
+          Nomeie ela como <code>Sapiens Leads</code>.<br>
+          Copie o ID da URL â Ã© o trecho longo entre <code>/d/</code> e <code>/edit</code>:<br>
+          <code>docs.google.com/spreadsheets/d/<strong>SEU_ID_AQUI</strong>/edit</code></p>
+          <div class="input-row">
+            <input type="text" id="setup-sheet-id" placeholder="Cole o ID da planilha aqui">
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Criar o Web App (Google Apps Script)</h4>
+          <p>Na planilha, clique em <strong>ExtensÃµes â Apps Script</strong>.<br>
+          Apague o cÃ³digo existente e cole o cÃ³digo abaixo, depois clique em <strong>Implantar â Nova implantaÃ§Ã£o â Web App</strong>.<br>
+          Em "Quem pode acessar" escolha <strong>Qualquer pessoa</strong>. Clique em Implantar e copie a URL gerada.</p>
+          <div style="margin-top:8px;">
+            <button class="btn btn-sm" onclick="copyAppsScript()">ð Copiar cÃ³digo Apps Script</button>
+          </div>
+          <div class="input-row" style="margin-top:10px;">
+            <input type="text" id="setup-api-url" placeholder="Cole a URL do Web App aqui">
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Conectar e importar dados histÃ³ricos</h4>
+          <p>Cole os dois valores acima e clique em Conectar. O dashboard vai gravar os dados histÃ³ricos automaticamente na planilha.</p>
+        </div>
+      </div>
+
+    </div>
+    <div class="setup-footer">
+      <button class="btn btn-primary" onclick="connectSheets()">Conectar ao Google Sheets</button>
+      <button class="btn" onclick="skipSetup()">Usar sem Sheets (local)</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">LanÃ§ar dia</h3>
+    <div class="msub" id="modal-sub">Preencha os dados do dia</div>
+    <div class="frow">
+      <div class="fg"><label>Data</label><input type="date" id="f-date"></div>
+      <div class="fg"><label>Investimento R$</label><input type="number" id="f-inv" step="0.01" placeholder="0.00"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Leads FB Ads</label><input type="number" id="f-leads" placeholder="0"></div>
+      <div class="fg"><label>Leads CRM</label><input type="number" id="f-crm" placeholder="0"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>R. Fechamento</label><input type="number" id="f-rfech" placeholder="0"></div>
+      <div class="fg"><label>Vendas</label><input type="number" id="f-vendas" placeholder="0"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Ticket MÃ©dio R$</label><input type="number" id="f-ticket" placeholder="0"></div>
+      <div class="fg"><label>Valor Vendido R$</label><input type="number" id="f-vv" placeholder="auto"></div>
+    </div>
+    <div class="frow">
+      <div class="fg full"><label>ObservaÃ§Ã£o</label><input type="text" id="f-obs" placeholder="Opcional..."></div>
+    </div>
+    <div class="mactions">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveModal()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="overlay" id="modal-settings">
+  <div class="modal">
+    <h3>ConfiguraÃ§Ãµes</h3>
+    <div class="msub">ConexÃ£o com Google Sheets</div>
+    <div class="frow">
+      <div class="fg full"><label>ID da Planilha</label><input type="text" id="cfg-sheet-id" placeholder="ID do Google Sheets"></div>
+    </div>
+    <div class="frow">
+      <div class="fg full"><label>URL do Web App (Apps Script)</label><input type="text" id="cfg-api-url" placeholder="https://script.google.com/macros/s/..."></div>
+    </div>
+    <div class="mactions">
+      <button class="btn" onclick="document.getElementById('modal-settings').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveSettings()">Salvar e reconectar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// APPS SCRIPT CODE (to be deployed by user)
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const APPS_SCRIPT_CODE = `
+function doGet(e) {
+  const action = e.parameter.action;
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  if (action === 'read') {
+    const month = e.parameter.month;
+    let sheet = ss.getSheetByName(month);
+    if (!sheet) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+    const data = sheet.getDataRange().getValues();
+    const headers = data[0];
+    const rows = data.slice(1).map(r => {
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = r[i]);
+      return obj;
+    });
+    return ContentService.createTextOutput(JSON.stringify(rows)).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (action === 'readAll') {
+    const sheets = ss.getSheets();
+    const result = {};
+    sheets.forEach(sheet => {
+      const name = sheet.getName();
+      const data = sheet.getDataRange().getValues();
+      if (data.length < 2) { result[name] = []; return; }
+      const headers = data[0];
+      result[name] = data.slice(1).map(r => {
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = r[i]);
+        return obj;
+      });
+    });
+    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  return ContentService.createTextOutput('ok').setMimeType(ContentService.MimeType.TEXT);
+}
+
+function doPost(e) {
+  const body = JSON.parse(e.postData.contents);
+  const action = body.action;
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const HEADERS = ['date','inv','leads_fb','leads_crm','rfech','vendas','ticket','vv','obs'];
+
+  if (action === 'upsert') {
+    const month = body.month;
+    const row = body.row;
+    let sheet = ss.getSheetByName(month);
+    if (!sheet) {
+      sheet = ss.insertSheet(month);
+      sheet.appendRow(HEADERS);
+    }
+    const data = sheet.getDataRange().getValues();
+    const dateCol = 1;
+    let found = false;
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === row.date) {
+        const rowData = HEADERS.map(h => row[h] !== undefined ? row[h] : '');
+        sheet.getRange(i + 1, 1, 1, rowData.length).setValues([rowData]);
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      sheet.appendRow(HEADERS.map(h => row[h] !== undefined ? row[h] : ''));
+    }
+    return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (action === 'delete') {
+    const month = body.month;
+    const date = body.date;
+    const sheet = ss.getSheetByName(month);
+    if (!sheet) return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === date) { sheet.deleteRow(i + 1); break; }
+    }
+    return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (action === 'bulkWrite') {
+    const monthData = body.data;
+    Object.entries(monthData).forEach(([month, rows]) => {
+      let sheet = ss.getSheetByName(month);
+      if (!sheet) { sheet = ss.insertSheet(month); }
+      sheet.clearContents();
+      sheet.appendRow(HEADERS);
+      rows.forEach(row => sheet.appendRow(HEADERS.map(h => row[h] !== undefined ? row[h] : '')));
+    });
+    return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  return ContentService.createTextOutput(JSON.stringify({ok:false})).setMimeType(ContentService.MimeType.JSON);
+}
+`.trim();
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// CONFIG & STATE
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const LS_CFG   = 'sapiens_cfg_v1';
+const LS_CACHE = 'sapiens_cache_v1';
+
+const MONTHS = {
+  '2025-09':'Set/25','2025-10':'Out/25','2025-11':'Nov/25','2025-12':'Dez/25',
+  '2026-01':'Jan/26','2026-02':'Fev/26','2026-03':'Mar/26','2026-04':'Abr/26',
+  '2026-05':'Mai/26','2026-06':'Jun/26','2026-07':'Jul/26','2026-08':'Ago/26',
+  '2026-09':'Set/26','2026-10':'Out/26','2026-11':'Nov/26','2026-12':'Dez/26',
+};
+
+// Seed histÃ³rico da planilha
+const SEED = {
+  '2025-09':[
+    {date:'2025-09-15',inv:89,leads_fb:8,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-09-16',inv:90,leads_fb:2,leads_crm:1,rfech:0,vendas:1,ticket:1388,vv:1388,obs:''},
+    {date:'2025-09-17',inv:120,leads_fb:1,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-09-18',inv:110,leads_fb:1,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-09-19',inv:147,leads_fb:7,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-09-20',inv:123,leads_fb:7,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-09-21',inv:143,leads_fb:3,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-09-22',inv:132,leads_fb:11,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-09-23',inv:209,leads_fb:6,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-09-24',inv:197,leads_fb:10,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-09-25',inv:195,leads_fb:12,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-09-26',inv:85,leads_fb:2,leads_crm:1,rfech:0,vendas:1,ticket:1688,vv:1688,obs:''},
+    {date:'2025-09-27',inv:33,leads_fb:0,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-09-28',inv:70,leads_fb:3,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-09-29',inv:119,leads_fb:7,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-09-30',inv:116,leads_fb:4,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+  ],
+  '2025-10':[
+    {date:'2025-10-01',inv:138,leads_fb:5,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-02',inv:127,leads_fb:14,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-03',inv:111,leads_fb:4,leads_crm:1,rfech:0,vendas:1,ticket:1388,vv:1388,obs:''},
+    {date:'2025-10-04',inv:79,leads_fb:4,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-05',inv:12.86,leads_fb:1,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-06',inv:103,leads_fb:11,leads_crm:1,rfech:0,vendas:1,ticket:1388,vv:1388,obs:''},
+    {date:'2025-10-07',inv:116,leads_fb:7,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-08',inv:80,leads_fb:10,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-09',inv:106.57,leads_fb:13,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-10',inv:63.68,leads_fb:2,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-13',inv:157,leads_fb:13,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-14',inv:14,leads_fb:2,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-15',inv:91,leads_fb:7,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-16',inv:112,leads_fb:3,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-17',inv:106,leads_fb:7,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-18',inv:94.43,leads_fb:8,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-19',inv:78,leads_fb:3,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-20',inv:92.79,leads_fb:4,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-21',inv:72,leads_fb:2,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-22',inv:96,leads_fb:3,leads_crm:1,rfech:0,vendas:1,ticket:1788,vv:1788,obs:''},
+    {date:'2025-10-23',inv:103,leads_fb:6,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-24',inv:99,leads_fb:7,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-25',inv:88,leads_fb:6,leads_crm:1,rfech:0,vendas:1,ticket:1388,vv:1388,obs:''},
+    {date:'2025-10-26',inv:86,leads_fb:6,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-27',inv:99,leads_fb:2,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-28',inv:94,leads_fb:5,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-29',inv:90,leads_fb:2,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-10-30',inv:130,leads_fb:10,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+  ],
+  '2025-11':[
+    {date:'2025-11-01',inv:122.28,leads_fb:8,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-02',inv:159.57,leads_fb:13,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-03',inv:137,leads_fb:8,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-04',inv:123,leads_fb:8,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-05',inv:103,leads_fb:6,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-06',inv:95,leads_fb:7,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-07',inv:83.67,leads_fb:5,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-08',inv:59,leads_fb:2,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-10',inv:120,leads_fb:10,leads_crm:1,rfech:0,vendas:1,ticket:1988,vv:1988,obs:''},
+    {date:'2025-11-11',inv:121,leads_fb:11,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-12',inv:161.41,leads_fb:13,leads_crm:1,rfech:0,vendas:1,ticket:1688,vv:1688,obs:''},
+    {date:'2025-11-13',inv:134,leads_fb:7,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-14',inv:129,leads_fb:9,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-15',inv:119.45,leads_fb:16,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-16',inv:151,leads_fb:10,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-17',inv:62,leads_fb:7,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-18',inv:88,leads_fb:4,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-19',inv:110,leads_fb:7,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-20',inv:113,leads_fb:10,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-21',inv:101,leads_fb:4,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-22',inv:85,leads_fb:4,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-23',inv:114,leads_fb:10,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-24',inv:97,leads_fb:13,leads_crm:1,rfech:0,vendas:1,ticket:988,vv:988,obs:''},
+    {date:'2025-11-25',inv:138,leads_fb:10,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-26',inv:127,leads_fb:5,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-27',inv:24,leads_fb:1,leads_crm:1,rfech:0,vendas:1,ticket:1588,vv:1588,obs:''},
+    {date:'2025-11-28',inv:164,leads_fb:5,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-11-29',inv:53,leads_fb:4,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+  ],
+  '2025-12':[
+    {date:'2025-12-01',inv:60,leads_fb:2,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-12-02',inv:77,leads_fb:4,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2025-12-03',inv:140,leads_fb:4,leads_crm:1,rfech:1,vendas:1,ticket:988,vv:988,obs:''},
+  ],
+  '2026-03':[
+    {date:'2026-03-01',inv:30,leads_fb:2,leads_crm:0,rfech:0,vendas:2,ticket:2000,vv:4000,obs:''},
+    {date:'2026-03-02',inv:30,leads_fb:8,leads_crm:2,rfech:1,vendas:1,ticket:2000,vv:2000,obs:''},
+    {date:'2026-03-03',inv:40,leads_fb:13,leads_crm:2,rfech:1,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2026-03-04',inv:38.22,leads_fb:13,leads_crm:1,rfech:0,vendas:1,ticket:2000,vv:2000,obs:''},
+    {date:'2026-03-05',inv:31.28,leads_fb:13,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2026-03-06',inv:33,leads_fb:6,leads_crm:1,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2026-03-07',inv:14.44,leads_fb:6,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2026-03-08',inv:10.5,leads_fb:5,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2026-03-09',inv:26,leads_fb:3,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2026-03-10',inv:42,leads_fb:8,leads_crm:0,rfech:1,vendas:0,ticket:null,vv:0,obs:''},
+    {date:'2026-03-11',inv:68,leads_fb:22,leads_crm:0,rfech:1,vendas:0,ticket:null,vv:0,obs:''},
+  ],
+};
+
+let CFG = JSON.parse(localStorage.getItem(LS_CFG)||'{}');
+let DB  = JSON.parse(localStorage.getItem(LS_CACHE)||'null') || JSON.parse(JSON.stringify(SEED));
+let activeMonth = '2026-03';
+let charts = {};
+let editDate = null;
+let quickTimer = null;
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// BOOT
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+async function boot() {
+  Object.keys(MONTHS).forEach(k=>{ if(!DB[k]) DB[k]=[]; });
+
+  if(CFG.apiUrl) {
+    document.getElementById('setup-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    setStatus('loading','Sincronizando...');
+    await syncFromSheets();
+  } else {
+    document.getElementById('setup-screen').style.display='block';
+    document.getElementById('app').style.display='none';
+  }
+
+  const now = new Date();
+  buildSidebar();
+  setActiveMonth('2026-03');
+}
+tElementById('app').style.display='flex';
+    setStatus('loading','Sincronizando...');
+    await syncFromSheets();
+  } else {
+    document.getElementById('setup-screen').style.display='block';
+    document.getElementById('app').style.display='none';
+  }
+
+  const now = new Date();
+  buildSidebar();
+  setActiveMonth('2026-03');
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// SHEETS API
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+async function api(params) {
+  if(!CFG.apiUrl) return null;
+  try {
+    const url = CFG.apiUrl + (params.method==='GET'?'?'+new URLSearchParams(params.query):'');
+    const opts = params.method==='POST'
+      ? {method:'POST',body:JSON.stringify(params.body),headers:{'Content-Type':'application/json'}}
+      : {method:'GET'};
+    const r = await fetch(url, opts);
+    return await r.json();
+  } catch(e) {
+    console.error('API error',e);
+    return null;
+  }
+}
+
+async function syncFromSheets() {
+  const data = await api({method:'GET', query:{action:'readAll'}});
+  if(data && typeof data === 'object' && !data.error) {
+    Object.entries(data).forEach(([month, rows]) => {
+      if(Array.isArray(rows) && rows.length) {
+        DB[month] = rows.map(r=>({
+          date:r.date||'', inv:num(r.inv), leads_fb:num(r.leads_fb),
+          leads_crm:num(r.leads_crm), rfech:num(r.rfech), vendas:num(r.vendas),
+          ticket:num(r.ticket), vv:num(r.vv), obs:r.obs||''
+        }));
+      }
+    });
+    saveCache();
+    setStatus('ok','Sincronizado');
+  } else {
+    setStatus('err','Erro de conexÃ£o');
+  }
+  renderAll();
+}
+
+async function pushRow(month, row) {
+  if(!CFG.apiUrl) return;
+  setStatus('loading','Salvando...');
+  const res = await api({method:'POST', body:{action:'upsert', month, row}});
+  if(res&&res.ok) setStatus('ok','Salvo â');
+  else setStatus('err','Erro ao salvar');
+}
+
+async function deleteFromSheets(month, date) {
+  if(!CFG.apiUrl) return;
+  await api({method:'POST', body:{action:'delete', month, date}});
+}
+
+async function bulkWrite(data) {
+  if(!CFG.apiUrl) return;
+  setStatus('loading','Gravando histÃ³rico...');
+  const res = await api({method:'POST', body:{action:'bulkWrite', data}});
+  if(res&&res.ok) { setStatus('ok','HistÃ³rico gravado â'); toast('HistÃ³rico gravado no Sheets â','ok'); }
+  else setStatus('err','Erro ao gravar');
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// SETUP
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+async function connectSheets() {
+  const sheetId = document.getElementById('setup-sheet-id').value.trim();
+  const apiUrl  = document.getElementById('setup-api-url').value.trim();
+  if(!apiUrl){ toast('Cole a URL do Web App','err'); return; }
+  CFG = {sheetId, apiUrl};
+  localStorage.setItem(LS_CFG, JSON.stringify(CFG));
+  document.getElementById('setup-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  setStatus('loading','Gravando histÃ³rico...');
+  buildSidebar();
+  setActiveMonth('2026-03');
+  await bulkWrite(DB);
+  await syncFromSheets();
+}
+
+function skipSetup() {
+  CFG = {apiUrl:null};
+  localStorage.setItem(LS_CFG, JSON.stringify(CFG));
+  document.getElementById('setup-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  buildSidebar();
+  setActiveMonth('2026-03');
+  renderAll();
+  toast('Modo local ativado. Dados ficam neste navegador.','');
+}
+
+function copyAppsScript() {
+  navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(()=>toast('CÃ³digo copiado! Cole no Apps Script â','ok'));
+}
+
+function openSettings() {
+  document.getElementById('cfg-sheet-id').value = CFG.sheetId||'';
+  document.getElementById('cfg-api-url').value  = CFG.apiUrl||'';
+  document.getElementById('modal-settings').classList.add('open');
+}
+
+async function saveSettings() {
+  CFG.sheetId = document.getElementById('cfg-sheet-id').value.trim();
+  CFG.apiUrl  = document.getElementById('cfg-api-url').value.trim();
+  localStorage.setItem(LS_CFG, JSON.stringify(CFG));
+  document.getElementById('modal-settings').classList.remove('open');
+  setStatus('loading','Reconectando...');
+  await syncFromSheets();
+  toast('ConfiguraÃ§Ãµes salvas â','ok');
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// DFUTA HELPERS
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const num = v => (v===null||v===undefined||v===''||isNaN(Number(v)))?null:Number(v);
+const fmt = (v,d=0,p='',s='') => v===null>'<span class="m">â</span>':p+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d})+s;
+const fmtPct = v => v===null>'<span class="m">â</span>':(v*100).toFixed(1)+'%';
+const todayISO = () => new Date().toISOString().slice(0,10);
+
+function calc(r){
+  const cpl  = r.leads_fb&&r.inv ? r.inv/r.leads_fb : null;
+  const taxa = r.leads_crm&&r.rfech ? r.rfech/r.leads_crm : null;
+  const vv   = r.vv||(r.vendas&&r.ticket?r.vendas*r.ticket:null)||0;
+  const roas = vv&&r.inv ? vv/r.inv : null;
+  const cac  = r.inv&&r.vendas ? r.inv/r.vendas : null;
+  return {...r, cpl, taxa, vv_e:vv, roas, cac};
+}
+
+function monthRows(mk){
+  return (DB[mk||activeMonth]||[]).map(calc).sort((a,b)=>a.date.localeCompare(b.date));
+}
+
+function sumRows(rows){
+  const f = rows.filter(r=>r.inv!==null);
+  const inv=f.reduce((s,r)=>s+(r.inv||0),0), leads=f.reduce((s,r)=>s+(r.leads_fb||0),0),
+        crm=f.reduce((s,r)=>s+(r.leads_crm||0),0), rfech=f.reduce((s,r)=>s+(r.rfech||0),0),
+        vendas=f.reduce((s,r)=>s+(r.vendas||0),0), vv=f.reduce((s,r)=>s+(r.vv_e||0),0);
+  return {inv,meads,crm,rfech,vendas,vv,dias:f.length,
+    cpl:leads?inv/leads:null, taxa:crm?rfech/crm:null, tc:rfech?vendas/rfech:null,
+    ticket:vendas?vv/vendas:null, cac:vendas?inv/vendas:null, roas:inv+vv/inv:null};
+}
+
+function saveCache(){ localStorage.setItem(LS_CACHE, JSON.stringify(DB)); }
+
+function upsert(mk, row)s{
+  if(!DB[mk]) DB[mk]=[];
+  const idx = DB[mk].findIndex(r=>r.date===row.date);
+  if(idx>=0) DB[mk][idx]={...DB[mk][idx],...row};
+  else DB[mk].push(row);
+  saveCache();
+}
+imer[date] = setTimeout(()=>{ pushRow(mk, row); renderAll(); buildSidebar(); }, 700);
+  // instant KPI update
+  renderKPIs('daily-kpis', sumRows(monthRows()), monthRows().length);
+}
+
+async function delRow(date){
+  if(!confirm('Remover o dia '+date+'?')) return;
+  DB[activeMonth] = (DB[activeMonth]||[]).filter(r=>r.date!==date);
+  saveCache();
+  await deleteFromSheets(activeMonth, date);
+  renderAll(); buildSidebar();
+  toast('Dia removido','ok');
+}
+
+function renderCharts(rows){
+  const f = rows.filter(r=>r.inv!==null);
+  const labels=f.map(r=>r.date.slice(8)), leads=f.map(r=>r.leads_fb||0), inv=f.map(r=>r.inv||0), vv=f.map(r=>r.vv_e||0);
+  const base={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{color:'#5a5a72',font:{size:9,family:'DM Mono'}},grid:{color:'#13131f'}},
+            y:{ticks:{color:'#5a5a72',font:{size:9,family:'DM Mono'}},grid:{color:'#13131f'}}}};
+  if(charts.leads) charts.leads.destroy();
+  charts.leads=new Chart(document.getElementById('ch-leads').getContext('2d'),
+    {type:'bar',data:{labels,datasets:[{data:leads,backgroundColor:'rgba(111,99,245,.7)',borderRadius:3}]},options:base});
+  if(charts.inv) charts.inv.destroy();
+  charts.inv=new Chart(document.getElementById('ch-inv').getContext('2d'),
+    {type:'bar',data:{labels,datasets:[{data:inv,label:'Invest.',backgroundColor:'rgba(111,99,245,.4)',borderRadius:3},{data:vv,label:'Vendido',backgroundColor:'rgba(0,200,150,.7)',borderRadius:3}]},
+     options:{...base,plugins:{legend:{display:true,labels:{color:'#5a5a72',font:{size:9,family:'DM Mono'},boxWidth:10}}}}});
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// WEEKLY
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function renderWeekly(){
+  const rows = monthRows();
+  renderKPIs('weekly-kpis', sumRows(rows), rows.length);
+  const weeks=[[],[],[],[],[]];
+  rows.forEach(r=>{ const d=parseInt(r.date.slice(8)); weeks[d<=7?0:d<=14?1:d<=21?2:d<=28?3:4].push(r); });
+  const [y,m]=activeMonth.split('-');
+  const wlabels=[`01â07`,`08â14`,`15â21`,`22â28`,`29â31`];
+  document.getElementById('weekly-grid').innerHTML=weeks.map((wr,i)=>{
+    if('wr.length) return '';
+    const ws=sumRows(wr);
+    const rc=ws.roas===null?'':ws.roas>=3?'g':ws.roas>=1.5?'y':'r';
+    return `<div class="week-card">
+      <div class="week-hd">Semana ${i+1} <span class="week-tag">${wlabels[i]}/${m}</span></div>
+      <div class="wrow"><span class="wl">Investimento</span><span>R$ ${ws.inv.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+      <div class="wrow"><span class="wl">Leads FB</span><span>${ws.leads}</span></div>
+      <div class="wrow"><span class="wl">CPL</span><span>${ws.cpl?'R$ '+ws.cpl.toFixed(2):'â'}</span></div>
+      <div class="wrow"><span class="wl">Leads CRM</span><span>${ws.crm}</span></div>
+      <div class="wrow"><span class="wl">R. Fechamento</span><span>${ws.rfech}</span></div>
+      <div class="wrow"><span class="wl">Vendas</span><span class="g">${ws.vendas}</span></div>
+      <div class="wrow"><span class="wl">Valor Vendido</span><span class="g">R$ ${ws.vv.toLocaleString('pt-BR',{minimumFractionDigits:0})}</span></div>
+      <div class="wrow"><span class="wl">Ticket MÃ©dio</span><span>${ws.ticket?'R$ '+ws.ticket.toLocaleString('pt-BR',{minimumFractionDigits:0}):'â'}</span></div>
+      <div class="wrow"><span class="wl">ROAS</span><span class="${rc}">${ws.roas?ws.roas.toFixed(2)+'x':'â'}</span></div>
+      <div class="wrow"><span class="wl">CAC</span><span>${ws.cac?'R$ '+ws.cac.toLocaleString('pt-BR',{minimumFractionDigits:0}):'â'}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// MONTHLY
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function renderMonthly(){
+  const all=Object.entries(MONTHS).map(([k,v])=>{
+    const rows=monthRows(k); const s=sumRows(rows);
+    return {key:k,label:v,...s};
+  }).filter(m=>m.dias>0||m.inv>0);
+  const totInv=all.reduce((s,m)=>s+m.inv,0), totLeads=all.reduce((s,m)=>s+m.leads,0),
+        totVendas=all.reduce((s,m)=>s+m.vendas,0), totVV=all.reduce((s,m)=>s+m.vv,0);
+  renderKPIs('monthly-kpis',{inv:totInv,leads:totLeads,crm:0,rfech:0,vendas:totVendas,vv:totVV,
+    cpl:totLeads?totInv/totLeads:null,roas:totInv?totVV/totInv:null,cac:totVendas?totInv/totVendas:null,
+    tc:null,ticket:totVendas?totVV/totVendas:null,taxa:null},all.length);
+  const labels=all.map(m=>m.label), roasArr=all.map(m=>m.roas||0), vvArr=all.map(m=>m.vv||0);
+  const co={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{color:'#5a5a72',font:{size:9,family:'DM Mono'}},grid:{color:'#13131f'}},
+            y:{ticks:{color:'#5a5a72',font:{size:9,family:'DM Mono'}},grid:{color:'#13131f'}}}};
+  if(charts.roas) charts.roas.destroy();
+  charts.roas=new Chart(document.getElementById('ch-roas').getContext('2d'),
+    {type:'line',data:{labels,datasets:[{data:roasArr,borderColor:'var(--a)',backgroundColor:'rgba(111,99,245,.1)',tension:.3,fill:true,pointBackgroundColor:'var(--a)',pointRadius:4}]},options:co});
+  if(charts.vvm) charts.vvm.destroy();
+  charts.vvm=new Chart(document.getElementById('ch-vv').getContext('2d'),
+    {type:'bar',data:{labels,datasets:[{data:vvArr,backgroundColor:'rgba(0,200,150,.7)',borderRadius:4}]},options:co});
+  document.getElementById('monthly-grid').innerHTML=all.reverse().map(m=>{
+    const cur=m.key===activeMonth;
+    const rc=m.roas===null?'inherit':m.roas>=3?'var(--green)':m.roas>=1.5?'var(--yellow)':'var(--red)';
+    return `<div class="mc">
+      <div class="mc-hd"><div class="mc-name">${m.label}</div><span class="mc-tag ${cur?'cur':'done'}">${cur?'â em curso':'concluÃ­do'}</span></div>
+      <div class="mstat"><span>Investimento</span><span>R$ ${m.inv.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+      <div class="mstat"><span>Leads FB</span><span>${m.leads}</span></div>
+      <div class="mstat"><span>CPL</span><span>${m.cpl?'R$ '+m.cpl.toFixed(2):'â'}</span></div>
+      <div class="mstat"><span>Vendas</span><span style="color:var(--green)">${m.vendas}</span></div>
+      <div class="mstat"><span>Valor Vendido</span><span style="color:var(--green)">R$ ${m.vv.toLocaleString('pt-BR',{minimumFractionDigits:0})}</span></div>
+      <div class="mstat"><span>Ticket MÃ©dio</span><span>${m.ticket?'R$ '+m.ticket.toLocaleString('pt-BR',{minimumFractionDigits:0}):'â'}</span></div>
+      <div class="mstat"><span>ROAS</span><span style="color:${rc}">${m.roas?m.roas.toFixed(2)+'x':'â'}</span></div>
+      <div class="mstat"><span>CAC</span><span>${m.cac?'R$ '+m.cac.toLocaleString('pt-BR',{minimumFractionDigits:0}):'â'}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// MODAL
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function openAddModal(date){
+  editDate=date||null;
+  const t=date||todayISO();
+  document.getElementById('modal-title').textContent=date?'Editar '+date:'LanÃ§ar dia';
+  document.getElementById('modal-sub').textContent=date?'Atualize os valores':'Insira os dados do dia';
+  document.getElementById('f-date').value=t;
+  // determine month from date
+  const mk=t.slice(0,7);
+  const row=(DB[mk]||[]).find(r=>r.date===t);
+  [['f-inv','inv'],['f-leads','leads_fb'],['f-crm','leads_crm'],['f-rfech','rfech'],['f-vendas','vendas'],['f-ticket','ticket'],['f-vv','vv'],['f-obs','obs']].forEach(([id,f])=>{
+    const el=document.getElementById(id); if(el) el.value=row&&row[f]!=null?row[f]:'';
+  });
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+
+async function saveModal(){
+  const date=document.getElementById('f-date').value;
+  if(!date){toast('Selecione uma data','err');return;}
+  const mk=date.slice(0,7);
+  if(!DB[mk]) DB[mk]=[];
+  const vendas_v=num(document.getElementById('f-vendas').value);
+  const ticket_v=num(document.getElementById('f-ticket').value);
+  const vv_v=num(document.getElementById('f-vv').value);
+  const row={
+    date, inv:num(document.getElementById('f-inv').value),
+    leads_fb:num(document.getElementById('f-leads').value),
+    leads_crm:num(document.getElementById('f-crm').value),
+    rfech:num(document.getElementById('f-rfech').value),
+    vendas:vendas_v, ticket:ticket_v,
+    vv:vv_v||(vendas_v&&ticket_v?vendas_v*ticket_v:null),
+    obs:document.getElementById('f-obs').value,
+  };
+  if(mk!==activeMonth) setActiveMonth(mk);
+  upsert(mk, row);
+  closeModal();
+  renderAll(); buildSidebar();
+  await pushRow(mk, row);
+  toast('Dia '+date+' salvo â','ok');
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// SIDEBAR & NAV
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function buildSidebar(){
+  document.getElementById('month-nav').innerHTML=
+    Object.entries(MONTHS).reverse().map(([k,v])=>`
+      <div class="nav-item ${k===activeMonth?'active':''}" onclick="setActiveMonth('${k}')">
+        <span class="ico">â¦</span>${v}
+        <span class="badge">${(DB[k]||[]).length}d</span>
+      </div>`).join('');
+}
+
+function setActiveMonth(mk){
+  activeMonth=mk;
+  const label=MONTHS[mk]||mk;
+  const titleEl=document.getElementById('active-month-label');
+  if(titleEl) titleEl.textContent=label;
+  const tblEl=document.getElementById('table-lbl');
+  if(tblEl) tblEl.textContent=label;
+  buildSidebar();
+  loadQuickEntry();
+  renderAll();
+}
+
+function showPage(p, el){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>{ if(['DiÃ¡rio','Semanal','Mensal'].some(t=>x.textContent.includes(t))) x.classList.remove('active'); });
+  document.getElementById('page-'+p).classList.add('active');
+  if(el) el.classList.add('active');
+  const titles={daily:'DiÃ¡rio',weekly:'Semanal',monthly:'Mensal'};
+  document.getElementById('page-title').innerHTML=titles[p]+' <span id="active-month-label">'+MONTHS[activeMonth]+'</span>';
+  if(p==='weekly') renderWeekly();
+  if(p==='monthly') renderMonthly();
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// EXPORT
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function exportCSV(){
+  const rows=[];
+  Object.entries(DB).sort().forEach(([mk,arr])=>{
+    arr.sort((a,b)=>a.date.localeCompare(b.date)).forEach(r=>{
+      const c=calc(r);
+      rows.push([r.date,r.inv??'',r.leads_fb??'',c.cpl?c.cpl.toFixed(2):'',r.leads_crm??'',r.rfech??'',r.vendas??'',r.ticket??'',c.vv_e??'',c.roas?c.roas.toFixed(2):'',c.cac?c.cac.toFixed(0):'',r.obs||''].join(','));
+    });
+  });
+  const hdr='Data,Investimento,Leads FB,CPL,Leads CRM,R.Fechamento,Vendas,Ticket,Valor Vendido,ROAS,CAC,Obs';
+  const blob=new Blob([hdr+'\n'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='sapiens_leads_'+todayISO()+'.csv';a.click();
+  toast('CSV exportado â','ok');
+}
+
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// UI HELPERS
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function setStatus(type, msg){
+  const pill=document.getElementById('status-pill');
+  const txt=document.getElementById('status-text');
+  pill.className='status-pill '+type;
+  txt.textContent=msg;
+}
+
+let toastTimer;
+function toast(msg, type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+(type?type+' ':'')+'show';
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// boot
+boot();
+</script>
+</body>
+</html>
