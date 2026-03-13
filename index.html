@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sapiens Marketing â DiÃ¡rio de Leads</title>
+<title>Sapiens Marketing — Diário de Leads</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
-/* âââ TOKENS âââââââââââââââââââââââââââââââââââââââ */
+/* ─── TOKENS ─────────────────────────────────────── */
 :root {
   --bg:      #07070e;
   --s1:      #0d0d18;
@@ -32,10 +32,10 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
 ::-webkit-scrollbar-track{background:var(--s1);}
 ::-webkit-scrollbar-thumb{background:var(--muted2);border-radius:4px;}
 
-/* âââ LAYOUT ââââââââââââââââââââââââââââââââââââââ */
+/* ─── LAYOUT ────────────────────────────────────── */
 .app{display:flex;min-height:100vh;}
 
-/* âââ SIDEBAR ââââââââââââââââââââââââââââââââââââââ */
+/* ─── SIDEBAR ────────────────────────────────────── */
 .sidebar{
   width:210px;min-width:210px;background:var(--s1);
   border-right:1px solid var(--border);
@@ -58,7 +58,179 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
 .nav-item.active{color:var(--a);border-left-color:var(--a);background:var(--a-dim);}
 .nav-item .ico{width:16px;text-align:center;font-size:13px;}
 .nav-item .badge{margin-left:auto;font-size:9px;color:var(--muted2);background:var(--s3);padding:1px 6px;border-radius:10px;}
-.sb-divider{height:1px;background:var(--border);margin:6px 14px;}2);
+.sb-divider{height:1px;background:var(--border);margin:6px 14px;}
+
+/* ─── MAIN ───────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;}
+
+/* ─── TOPBAR ─────────────────────────────────────── */
+.topbar{
+  padding:14px 24px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--s1);position:sticky;top:0;z-index:60;
+  backdrop-filter:blur(8px);
+}
+.topbar-title{font-family:'Syne',sans-serif;font-weight:700;font-size:17px;}
+.topbar-title span{color:var(--a);}
+.topbar-right{display:flex;gap:8px;align-items:center;}
+
+/* status pill */
+.status-pill{
+  display:flex;align-items:center;gap:5px;
+  font-size:10px;padding:5px 11px;border-radius:20px;
+  border:1px solid var(--border2);color:var(--muted);
+  background:var(--s2);transition:all .3s;
+}
+.status-pill.ok{border-color:var(--green);color:var(--green);}
+.status-pill.err{border-color:var(--red);color:var(--red);}
+.status-pill.loading{border-color:var(--yellow);color:var(--yellow);}
+.status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+/* ─── BUTTONS ────────────────────────────────────── */
+.btn{
+  font-family:'DM Mono',monospace;font-size:11px;
+  padding:7px 14px;border-radius:5px;cursor:pointer;
+  transition:all .15s;border:1px solid var(--border2);
+  background:var(--s2);color:var(--text);
+}
+.btn:hover{border-color:var(--a);color:var(--a);}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--a);border-color:var(--a);color:#fff;font-weight:500;}
+.btn-primary:hover{background:#7d72f7;color:#fff;box-shadow:0 0 16px var(--a-glow);}
+.btn-green{background:var(--green);border-color:var(--green);color:#000;font-weight:500;}
+.btn-green:hover{filter:brightness(1.1);color:#000;}
+.btn-danger{border-color:transparent;color:var(--muted2);background:transparent;}
+.btn-danger:hover{border-color:var(--red);color:var(--red);}
+.btn-sm{padding:4px 9px;font-size:10px;}
+
+/* ─── PAGES ──────────────────────────────────────── */
+.page{display:none;padding:22px 24px 32px;}
+.page.active{display:block;}
+
+/* ─── KPI ROW ────────────────────────────────────── */
+.kpi-row;display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px;}
+@media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:640px){.kpi-row{grid-template-columns:repeat(2,1fr);}}
+.kpi{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:8px;padding:14px 15px;position:relative;overflow:hidden;
+  transition:border-color .2s;
+}
+.kpi:hover{border-color:var(--muted2);}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kc,var(--a));}
+.kpi-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;}
+.kpi-val{font-family:'Syne',sans-serif;font-weight:800;font-size:21px;letter-spacing:-.5px;line-height:1;}
+.kpi-sub{font-size:9px;color:var(--muted);margin-top:5px;}
+
+/* ─── QUICK ENTRY ────────────────────────────────── */
+.quick-bar{
+  background:var(--s2);border:1px solid var(--a);border-radius:8px;
+  padding:14px 18px;margin-bottom:18px;
+  display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;
+}
+.qe-lbl{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--a);white-space:nowrap;padding-bottom:2px;}
+.qe-field{display:flex;flex-direction:column;gap:4px;}
+.qe-field label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+.qe-field input{
+  background:var(--s1);border:1px solid var(--border2);color:var(--text);
+  font-family:'DM Mono',monospace;font-size:12px;
+  padding:7px 10px;border-radius:4px;outline:none;
+  width:96px;transition:border .15s;text-align:right;
+  -moz-appearance:textfield;
+}
+.qe-field input::-webkit-outer-spin-button,
+.qe-field input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.qe-field input:focus{border-color:var(--a);background:var(--a-dim);}
+
+/* ─── CHARTS ─────────────────────────────────────── */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
+@media(max-width:860px){.chart-row{grid-template-columns:1fr;}}
+.chart-box{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:16px;}
+.chart-ttl{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
+
+/* ─── TABLE ──────────────────────────────────────── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:16px;}
+.card-hd{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--s2);}
+.card-ttl{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--s2);}
+th{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding:9px 11px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--border);}
+th.r{text-align:right;}
+td{padding:0;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr.tr-today{background:rgba(111,99,245,.06);}
+tr:hover td{background:rgba(255,255,255,0.018);}
+
+.cell{display:flex;align-items:center;height:36px;padding:0 11px;font-size:12px;}
+.cell.r{justify-content:flex-end;}
+td.ed{cursor:text;transition:background .1s;}
+td.ed:hover{background:rgba(111,99,245,.07)!important;}
+td.ed:focus-within{background:rgba(111,99,245,.14)!important;outline:1px solid var(--a);}
+td.ed input{
+  background:transparent;border:none;
+  color:var(--text);font-family:'DM Mono',monospace;font-size:12px;
+  width:100%;min-width:64px;padding:0;outline:none;text-align:right;
+  -moz-appearance:textfield;
+}
+td.ed input::-webkit-outer-spin-button,
+td.ed input::-webkit-inner-spin-button{-webkit-appearance:none;}
+td.ed input:focus{color:var(--a);}
+
+.g{color:var(--green);}
+.y{color:var(--yellow);}
+.r{color:var(--red);}
+.b{color:var(--blue);}
+.m{color:var(--muted);}
+
+/* ─── WEEKLY ─────────────────────────────────────── */
+.week-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:18px;}
+.week-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.week-hd{padding:11px 15px;background:var(--s2);border-bottom:1px solid var(--border);font-family:'Syne',sans-serif;font-weight:700;font-size:13px;display:flex;justify-content:space-between;align-items:center;}
+.week-tag{font-size:9px;padding:2px 8px;border-radius:20px;background:var(--a-dim);color:var(--a);font-family:'DM Mono',monospace;}
+.wrow{display:flex;justify-content:space-between;align-items:center;padding:7px 15px;border-bottom:1px solid var(--border);font-size:11px;}
+.wrow:last-child{border-bottom:none;}
+.wl{color:var(--muted);}
+
+/* ─── MONTHLY ────────────────────────────────────── */
+.month-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;}
+.mc{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:border-color .2s;}
+.mc:hover{border-color:var(--muted2);}
+.mc-hd{padding:13px 15px;background:var(--s2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.mc-name{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;}
+.mc-tag{font-size:9px;padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;}
+.mc-tag.cur{background:var(--a-dim);color:var(--a);}
+.mc-tag.done{background:var(--s3);color:var(--muted);}
+.mstat{display:flex;justify-content:space-between;padding:7px 15px;border-bottom:1px solid var(--border);font-size:11px;}
+.mstat:last-child{border-bottom:none;}
+
+/* ─── SETUP SCREEN ───────────────────────────────── */
+.setup-screen{
+  max-width:580px;margin:60px auto;
+  background:var(--s1);border:1px solid var(--border2);border-radius:12px;overflow:hidden;
+}
+.setup-hd{padding:28px;background:var(--s2);border-bottom:1px solid var(--border);}
+.setup-hd h2{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;}
+.setup-hd p{font-size:11px;color:var(--muted);line-height:1.7;}
+.setup-body{padding:28px;}
+.setup-step{
+  display:flex;gap:14px;padding:14px 0;
+  border-bottom:1px solid var(--border);
+}
+.setup-step:last-child{border-bottom:none;}
+.step-num{
+  width:26px;height:26px;border-radius:50%;
+  background:var(--a-dim);border:1px solid var(--a);
+  color:var(--a);font-family:'Syne',sans-serif;font-weight:700;
+  font-size:12px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:2px;
+}
+.step-content h4{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:4px;}
+.step-content p{font-size:11px;color:var(--muted);line-height:1.6;}
+.step-content a{color:var(--a);text-decoration:none;}
+.step-content a:hover{text-decoration:underline;}
+.step-content code{
+  background:var(--s3);border:1px solid var(--border2);
   padding:2px 7px;border-radius:3px;font-size:11px;color:var(--blue);
 }
 .input-row{display:flex;gap:8px;margin-top:10px;}
@@ -70,7 +242,7 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
 .input-row input:focus{border-color:var(--a);}
 .setup-footer{padding:0 28px 28px;display:flex;gap:8px;}
 
-/* âââ MODAL ââââââââââââââââââââââââââââââââââââââââ */
+/* ─── MODAL ──────────────────────────────────────── */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .overlay.open{display:flex;}
 .modal{background:var(--s1);border:1px solid var(--border2);border-radius:12px;padding:26px;width:420px;max-width:95vw;box-shadow:0 24px 80px rgba(0,0,0,.6);}
@@ -88,7 +260,7 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
 .fg input:focus,.fg textarea:focus{border-color:var(--a);}
 .mactions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;}
 
-/* âââ TOAST ââââââââââââââââââââââââââââââââââââââââ */
+/* ─── TOAST ──────────────────────────────────────── */
 .toast{
   position:fixed;bottom:22px;right:22px;
   background:var(--s2);border:1px solid var(--border2);
@@ -111,13 +283,13 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
 <nav class="sidebar">
   <div class="logo-wrap">
     <div class="brand">SAPIENS<em>.</em>MKT</div>
-    <div class="brand-sub">EscritÃ³rio PrevidenciÃ¡rio</div>
+    <div class="brand-sub">Escritório Previdenciário</div>
   </div>
 
-  <div class="sb-section">VisÃµes</div>
-  <div class="nav-item active" onclick="showPage('daily',this)"><span class="ico">â¦</span> DiÃ¡rio</div>
-  <div class="nav-item" onclick="showPage('weekly',this)"><span class="ico">â¤</span> Semanal</div>
-  <div class="nav-item" onclick="showPage('monthly',this)"><span class="ico">â</span> Mensal</div>
+  <div class="sb-section">Visões</div>
+  <div class="nav-item active" onclick="showPage('daily',this)"><span class="ico">▦</span> Diário</div>
+  <div class="nav-item" onclick="showPage('weekly',this)"><span class="ico">▤</span> Semanal</div>
+  <div class="nav-item" onclick="showPage('monthly',this)"><span class="ico">◉</span> Mensal</div>
 
   <div class="sb-divider"></div>
   <div class="sb-section">Meses</div>
@@ -125,24 +297,24 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
 
   <div class="sb-divider"></div>
   <div class="sb-section">Sistema</div>
-  <div class="nav-item" onclick="exportCSV()"><span class="ico">â¬</span> Exportar CSV</div>
-  <div class="nav-item" onclick="openSettings()"><span class="ico">â</span> ConfiguraÃ§Ãµes</div>
+  <div class="nav-item" onclick="exportCSV()"><span class="ico">⬇</span> Exportar CSV</div>
+  <div class="nav-item" onclick="openSettings()"><span class="ico">⚙</span> Configurações</div>
 </nav>
 
 <!-- MAIN -->
 <div class="main">
   <div class="topbar">
-    <div class="topbar-title" id="page-title">DiÃ¡rio <span id="active-month-label"></span></div>
+    <div class="topbar-title" id="page-title">Diário <span id="active-month-label"></span></div>
     <div class="topbar-right">
       <div class="status-pill" id="status-pill"><div class="status-dot"></div><span id="status-text">Conectando...</span></div>
-      <button class="btn btn-primary" onclick="openAddModal()">+ LanÃ§ar dia</button>
+      <button class="btn btn-primary" onclick="openAddModal()">+ Lançar dia</button>
     </div>
   </div>
 
   <!-- DAILY -->
   <div id="page-daily" class="page active">
     <div class="quick-bar" id="quick-bar">
-      <div class="qe-lbl">â¡ Hoje</div>
+      <div class="qe-lbl">⚡ Hoje</div>
       <div class="qe-field"><label>Invest. R$</label><input type="number" id="q-inv" step="0.01" placeholder="0.00" oninput="quickDebounce()"></div>
       <div class="qe-field"><label>Leads FB</label><input type="number" id="q-leads" placeholder="0" oninput="quickDebounce()"></div>
       <div class="qe-field"><label>Leads CRM</label><input type="number" id="q-crm" placeholder="0" oninput="quickDebounce()"></div>
@@ -186,8 +358,8 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
   <div id="page-monthly" class="page">
     <div class="kpi-row" id="monthly-kpis"></div>
     <div class="chart-row">
-      <div class="chart-box"><div class="chart-ttl">ROAS por mÃªs</div><canvas id="ch-roas" height="110"></canvas></div>
-      <div class="chart-box"><div class="chart-ttl">Valor vendido por mÃªs</div><canvas id="ch-vv" height="110"></canvas></div>
+      <div class="chart-box"><div class="chart-ttl">ROAS por mês</div><canvas id="ch-roas" height="110"></canvas></div>
+      <div class="chart-box"><div class="chart-ttl">Valor vendido por mês</div><canvas id="ch-vv" height="110"></canvas></div>
     </div>
     <div class="month-grid" id="monthly-grid"></div>
   </div>
@@ -198,8 +370,8 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
 <div id="setup-screen">
   <div class="setup-screen">
     <div class="setup-hd">
-      <h2>ConfiguraÃ§Ã£o inicial</h2>
-      <p>Siga os 3 passos abaixo para conectar o dashboard ao Google Sheets.<br>Leva menos de 10 minutos e sÃ³ precisa fazer uma vez.</p>
+      <h2>Configuração inicial</h2>
+      <p>Siga os 3 passos abaixo para conectar o dashboard ao Google Sheets.<br>Leva menos de 10 minutos e só precisa fazer uma vez.</p>
     </div>
     <div class="setup-body">
 
@@ -209,7 +381,7 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
           <h4>Criar a planilha no Google Sheets</h4>
           <p>Acesse <a href="https://sheets.google.com" target="_blank">sheets.google.com</a> e crie uma planilha nova.<br>
           Nomeie ela como <code>Sapiens Leads</code>.<br>
-          Copie o ID da URL â Ã© o trecho longo entre <code>/d/</code> e <code>/edit</code>:<br>
+          Copie o ID da URL — é o trecho longo entre <code>/d/</code> e <code>/edit</code>:<br>
           <code>docs.google.com/spreadsheets/d/<strong>SEU_ID_AQUI</strong>/edit</code></p>
           <div class="input-row">
             <input type="text" id="setup-sheet-id" placeholder="Cole o ID da planilha aqui">
@@ -221,11 +393,11 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
         <div class="step-num">2</div>
         <div class="step-content">
           <h4>Criar o Web App (Google Apps Script)</h4>
-          <p>Na planilha, clique em <strong>ExtensÃµes â Apps Script</strong>.<br>
-          Apague o cÃ³digo existente e cole o cÃ³digo abaixo, depois clique em <strong>Implantar â Nova implantaÃ§Ã£o â Web App</strong>.<br>
+          <p>Na planilha, clique em <strong>Extensões → Apps Script</strong>.<br>
+          Apague o código existente e cole o código abaixo, depois clique em <strong>Implantar → Nova implantação → Web App</strong>.<br>
           Em "Quem pode acessar" escolha <strong>Qualquer pessoa</strong>. Clique em Implantar e copie a URL gerada.</p>
           <div style="margin-top:8px;">
-            <button class="btn btn-sm" onclick="copyAppsScript()">ð Copiar cÃ³digo Apps Script</button>
+            <button class="btn btn-sm" onclick="copyAppsScript()">📋 Copiar código Apps Script</button>
           </div>
           <div class="input-row" style="margin-top:10px;">
             <input type="text" id="setup-api-url" placeholder="Cole a URL do Web App aqui">
@@ -236,8 +408,8 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
       <div class="setup-step">
         <div class="step-num">3</div>
         <div class="step-content">
-          <h4>Conectar e importar dados histÃ³ricos</h4>
-          <p>Cole os dois valores acima e clique em Conectar. O dashboard vai gravar os dados histÃ³ricos automaticamente na planilha.</p>
+          <h4>Conectar e importar dados históricos</h4>
+          <p>Cole os dois valores acima e clique em Conectar. O dashboard vai gravar os dados históricos automaticamente na planilha.</p>
         </div>
       </div>
 
@@ -252,7 +424,7 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
 <!-- ADD MODAL -->
 <div class="overlay" id="modal">
   <div class="modal">
-    <h3 id="modal-title">LanÃ§ar dia</h3>
+    <h3 id="modal-title">Lançar dia</h3>
     <div class="msub" id="modal-sub">Preencha os dados do dia</div>
     <div class="frow">
       <div class="fg"><label>Data</label><input type="date" id="f-date"></div>
@@ -267,11 +439,11 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
       <div class="fg"><label>Vendas</label><input type="number" id="f-vendas" placeholder="0"></div>
     </div>
     <div class="frow">
-      <div class="fg"><label>Ticket MÃ©dio R$</label><input type="number" id="f-ticket" placeholder="0"></div>
+      <div class="fg"><label>Ticket Médio R$</label><input type="number" id="f-ticket" placeholder="0"></div>
       <div class="fg"><label>Valor Vendido R$</label><input type="number" id="f-vv" placeholder="auto"></div>
     </div>
     <div class="frow">
-      <div class="fg full"><label>ObservaÃ§Ã£o</label><input type="text" id="f-obs" placeholder="Opcional..."></div>
+      <div class="fg full"><label>Observação</label><input type="text" id="f-obs" placeholder="Opcional..."></div>
     </div>
     <div class="mactions">
       <button class="btn" onclick="closeModal()">Cancelar</button>
@@ -283,8 +455,8 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
 <!-- SETTINGS MODAL -->
 <div class="overlay" id="modal-settings">
   <div class="modal">
-    <h3>ConfiguraÃ§Ãµes</h3>
-    <div class="msub">ConexÃ£o com Google Sheets</div>
+    <h3>Configurações</h3>
+    <div class="msub">Conexão com Google Sheets</div>
     <div class="frow">
       <div class="fg full"><label>ID da Planilha</label><input type="text" id="cfg-sheet-id" placeholder="ID do Google Sheets"></div>
     </div>
@@ -302,9 +474,9 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // APPS SCRIPT CODE (to be deployed by user)
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 const APPS_SCRIPT_CODE = `
 function doGet(e) {
   const action = e.parameter.action;
@@ -403,9 +575,9 @@ function doPost(e) {
 }
 `.trim();
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // CONFIG & STATE
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 const LS_CFG   = 'sapiens_cfg_v1';
 const LS_CACHE = 'sapiens_cache_v1';
 
@@ -416,7 +588,7 @@ const MONTHS = {
   '2026-09':'Set/26','2026-10':'Out/26','2026-11':'Nov/26','2026-12':'Dez/26',
 };
 
-// Seed histÃ³rico da planilha
+// Seed histórico da planilha
 const SEED = {
   '2025-09':[
     {date:'2025-09-15',inv:89,leads_fb:8,leads_crm:0,rfech:0,vendas:0,ticket:null,vv:0,obs:''},
@@ -523,9 +695,9 @@ let charts = {};
 let editDate = null;
 let quickTimer = null;
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // BOOT
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 async function boot() {
   Object.keys(MONTHS).forEach(k=>{ if(!DB[k]) DB[k]=[]; });
 
@@ -543,22 +715,10 @@ async function boot() {
   buildSidebar();
   setActiveMonth('2026-03');
 }
-tElementById('app').style.display='flex';
-    setStatus('loading','Sincronizando...');
-    await syncFromSheets();
-  } else {
-    document.getElementById('setup-screen').style.display='block';
-    document.getElementById('app').style.display='none';
-  }
 
-  const now = new Date();
-  buildSidebar();
-  setActiveMonth('2026-03');
-}
-
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // SHEETS API
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 async function api(params) {
   if(!CFG.apiUrl) return null;
   try {
@@ -589,7 +749,7 @@ async function syncFromSheets() {
     saveCache();
     setStatus('ok','Sincronizado');
   } else {
-    setStatus('err','Erro de conexÃ£o');
+    setStatus('err','Erro de conexão');
   }
   renderAll();
 }
@@ -598,7 +758,7 @@ async function pushRow(month, row) {
   if(!CFG.apiUrl) return;
   setStatus('loading','Salvando...');
   const res = await api({method:'POST', body:{action:'upsert', month, row}});
-  if(res&&res.ok) setStatus('ok','Salvo â');
+  if(res&&res.ok) setStatus('ok','Salvo ✓');
   else setStatus('err','Erro ao salvar');
 }
 
@@ -609,15 +769,15 @@ async function deleteFromSheets(month, date) {
 
 async function bulkWrite(data) {
   if(!CFG.apiUrl) return;
-  setStatus('loading','Gravando histÃ³rico...');
+  setStatus('loading','Gravando histórico...');
   const res = await api({method:'POST', body:{action:'bulkWrite', data}});
-  if(res&&res.ok) { setStatus('ok','HistÃ³rico gravado â'); toast('HistÃ³rico gravado no Sheets â','ok'); }
+  if(res&&res.ok) { setStatus('ok','Histórico gravado ✓'); toast('Histórico gravado no Sheets ✓','ok'); }
   else setStatus('err','Erro ao gravar');
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // SETUP
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 async function connectSheets() {
   const sheetId = document.getElementById('setup-sheet-id').value.trim();
   const apiUrl  = document.getElementById('setup-api-url').value.trim();
@@ -626,7 +786,7 @@ async function connectSheets() {
   localStorage.setItem(LS_CFG, JSON.stringify(CFG));
   document.getElementById('setup-screen').style.display='none';
   document.getElementById('app').style.display='flex';
-  setStatus('loading','Gravando histÃ³rico...');
+  setStatus('loading','Gravando histórico...');
   buildSidebar();
   setActiveMonth('2026-03');
   await bulkWrite(DB);
@@ -645,7 +805,7 @@ function skipSetup() {
 }
 
 function copyAppsScript() {
-  navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(()=>toast('CÃ³digo copiado! Cole no Apps Script â','ok'));
+  navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(()=>toast('Código copiado! Cole no Apps Script ✓','ok'));
 }
 
 function openSettings() {
@@ -661,15 +821,15 @@ async function saveSettings() {
   document.getElementById('modal-settings').classList.remove('open');
   setStatus('loading','Reconectando...');
   await syncFromSheets();
-  toast('ConfiguraÃ§Ãµes salvas â','ok');
+  toast('Configurações salvas ✓','ok');
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-// DFUTA HELPERS
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
+// DATA HELPERS
+// ═══════════════════════════════════════════════════════
 const num = v => (v===null||v===undefined||v===''||isNaN(Number(v)))?null:Number(v);
-const fmt = (v,d=0,p='',s='') => v===null>'<span class="m">â</span>':p+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d})+s;
-const fmtPct = v => v===null>'<span class="m">â</span>':(v*100).toFixed(1)+'%';
+const fmt = (v,d=0,p='',s='') => v===null?'<span class="m">—</span>':p+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d})+s;
+const fmtPct = v => v===null?'<span class="m">—</span>':(v*100).toFixed(1)+'%';
 const todayISO = () => new Date().toISOString().slice(0,10);
 
 function calc(r){
@@ -690,21 +850,126 @@ function sumRows(rows){
   const inv=f.reduce((s,r)=>s+(r.inv||0),0), leads=f.reduce((s,r)=>s+(r.leads_fb||0),0),
         crm=f.reduce((s,r)=>s+(r.leads_crm||0),0), rfech=f.reduce((s,r)=>s+(r.rfech||0),0),
         vendas=f.reduce((s,r)=>s+(r.vendas||0),0), vv=f.reduce((s,r)=>s+(r.vv_e||0),0);
-  return {inv,meads,crm,rfech,vendas,vv,dias:f.length,
+  return {inv,leads,crm,rfech,vendas,vv,dias:f.length,
     cpl:leads?inv/leads:null, taxa:crm?rfech/crm:null, tc:rfech?vendas/rfech:null,
-    ticket:vendas?vv/vendas:null, cac:vendas?inv/vendas:null, roas:inv+vv/inv:null};
+    ticket:vendas?vv/vendas:null, cac:vendas?inv/vendas:null, roas:inv?vv/inv:null};
 }
 
 function saveCache(){ localStorage.setItem(LS_CACHE, JSON.stringify(DB)); }
 
-function upsert(mk, row)s{
+function upsert(mk, row){
   if(!DB[mk]) DB[mk]=[];
   const idx = DB[mk].findIndex(r=>r.date===row.date);
   if(idx>=0) DB[mk][idx]={...DB[mk][idx],...row};
   else DB[mk].push(row);
   saveCache();
 }
-imer[date] = setTimeout(()=>{ pushRow(mk, row); renderAll(); buildSidebar(); }, 700);
+
+// ═══════════════════════════════════════════════════════
+// QUICK ENTRY
+// ═══════════════════════════════════════════════════════
+function loadQuickEntry(){
+  const t = todayISO();
+  const row = (DB[activeMonth]||[]).find(r=>r.date===t);
+  const map = {inv:'q-inv',leads_fb:'q-leads',leads_crm:'q-crm',rfech:'q-rfech',vendas:'q-vendas',ticket:'q-ticket'};
+  Object.entries(map).forEach(([f,id])=>{
+    const el=document.getElementById(id);
+    if(el) el.value = row&&row[f]!=null?row[f]:'';
+  });
+  const [y,m]=activeMonth.split('-');
+  const now=new Date();
+  const cur=parseInt(y)===now.getFullYear()&&parseInt(m)===(now.getMonth()+1);
+  document.getElementById('quick-bar').style.display=cur?'flex':'none';
+}
+
+function quickDebounce(){
+  clearTimeout(quickTimer);
+  quickTimer = setTimeout(doQuickSave, 800);
+}
+
+function doQuickSave(){
+  const t = todayISO();
+  const inv_v=num(document.getElementById('q-inv').value);
+  const vendas_v=num(document.getElementById('q-vendas').value);
+  const ticket_v=num(document.getElementById('q-ticket').value);
+  const row = {
+    date:t, inv:inv_v,
+    leads_fb:num(document.getElementById('q-leads').value),
+    leads_crm:num(document.getElementById('q-crm').value),
+    rfech:num(document.getElementById('q-rfech').value),
+    vendas:vendas_v, ticket:ticket_v,
+    vv:vendas_v&&ticket_v?vendas_v*ticket_v:null, obs:''
+  };
+  upsert(activeMonth, row);
+  renderKPIs('daily-kpis', sumRows(monthRows()), monthRows().length);
+  pushRow(activeMonth, row);
+  buildSidebar();
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════
+function renderAll(){
+  const rows = monthRows();
+  renderKPIs('daily-kpis', sumRows(rows), rows.length);
+  renderTable(rows);
+  renderCharts(rows);
+}
+
+function renderKPIs(id, s, dias){
+  const rc = s.roas===null?'var(--muted)':s.roas>=3?'var(--green)':s.roas>=1.5?'var(--yellow)':'var(--red)';
+  document.getElementById(id).innerHTML=[
+    {l:'Investimento', v:'R$ '+s.inv toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}), sub:dias+' dias', c:'var(--a)'},
+    {l:'Leads FB',     v:s.leads, sub:s.cpl?'CPL R$ '+s.cpl.toFixed(2):'—', c:'var(--blue)'},
+    {l:'Leads CRM',    v:s.crm,   sub:s.taxa?'Taxa '+fmtPct(s.taxa):'—', c:'#a78bfa'},
+    {l:'Vendas',       v:s.vendas,sub:s.ticket?'Ticket R$ '+s.ticket.toLocaleString('pt-BR',{minimumFractionDigits:0}):'—', c:'var(--yellow)'},
+    {l:'Valor Vendido',v:'R$ '+s.vv.toLocaleString('pt-BR',{minimumFractionDigits:0}), sub:s.tc?'Conv. '+fmtPct(s.tc):'—', c:'var(--green)'},
+    {l:'ROAS',         v:s.roas?s.roas.toFixed(2)+'x':'—', sub:s.cac?'CAC R$ '+s.cac.toLocaleString('pt-BR',{minimumFractionDigits:0}):'—', c:rc},
+  ].map(k=>`<div class="kpi" style="--kc:${k.c}"><div class="kpi-lbl">${k.l}</div><div class="kpi-val">${k.v}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+}
+
+function renderTable(rows){
+  const tbody = document.getElementById('daily-tbody');
+  if(!rows.length){
+    tbody.innerHTML=`<tr><td colspan="13"><div class="empty">Nenhum dado ainda.<br>Use a barra ⚡ acima ou clique em "+ Lançar dia"</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(r=>{
+    const isT = r.date===todayISO();
+    const rc = r.roas===null?'m':r.roas>=3?'g':r.roas>=1.5?'y':'r';
+    const fd = r.date.slice(8)+'/'+r.date.slice(5,7);
+    return `<tr class="${isT?'tr-today':''}">
+      <td><div class="cell"><strong>${fd}</strong>${isT?' <span style="font-size:9px;color:var(--a)">◉</span>':''}</div></td>
+      <td class="ed" onclick="focusIn(this)"><div class="cell r"><input type="number" step="0.01" value="${r.inv??''}" placeholder="—" onchange="upd('${r.date}','inv',this.value)"></div></td>
+      <td class="ed" onclick="focusIn(this)"><div class="cell r"><input type="number" value="${r.leads_fb??''}" placeholder="—" onchange="upd('${r.date}','leads_fb',this.value)"></div></td>
+      <td><div class="cell r m">${fmt(r.cpl,2,'R$ ')}</div></td>
+      <td class="ed" onclick="focusIn(this)"><div class="cell r"><input type="number" value="${r.leads_crm??''}" placeholder="—" onchange="upd('${r.date}','leads_crm',this.value)"></div></td>
+      <td class="ed" onclick="focusIn(this)"><div class="cell r"><input type="number" value="${r.rfech??''}" placeholder="—" onchange="upd('${r.date}','rfech',this.value)"></div></td>
+      <td><div class="cell r m">${fmtPct(r.taxa)}</div></td>
+      <td class="ed" onclick="focusIn(this)"><div class="cell r"><input type="number" value="${r.vendas??''}" placeholder="—" onchange="upd('${r.date}','vendas',this.value)"></div></td>
+      <td class="ed" onclick="focusIn(this)"><div class="cell r"><input type="number" value="${r.ticket??''}" placeholder="—" onchange="upd('${r.date}','ticket',this.value)"></div></td>
+      <td><div class="cell r g">${fmt(r.vv_e,0,'R$ ')}</div></td>
+      <td><div class="cell r ${rc}">${fmt(r.roas,2)}</div></td>
+      <td><div class="cell r">${fmt(r.cac,0,'R$ ')}</div></td>
+      <td><div class="cell"><button class="btn btn-danger btn-sm" onclick="delRow('${r.date}')">✕</button></div></td>
+    </tr>`;
+  }).join('');
+}
+
+function focusIn(td){ const i=td.querySelector('input'); if(i){i.focus();i.select();} }
+
+let updTimer={};
+function upd(date, field, val){
+  const mk = activeMonth;
+  const arr = DB[mk]||[];
+  const row = arr.find(r=>r.date===date);
+  if(!row) return;
+  row[field] = num(val);
+  if((field==='ticket'||field==='vendas')&&row.ticket&&row.vendas) row.vv=row.ticket*row.vendas;
+  saveCache();
+  // debounce push
+  clearTimeout(updTimer[date]);
+  updTimer[date] = setTimeout(()=>{ pushRow(mk, row); renderAll(); buildSidebar(); }, 700);
   // instant KPI update
   renderKPIs('daily-kpis', sumRows(monthRows()), monthRows().length);
 }
@@ -733,48 +998,48 @@ function renderCharts(rows){
      options:{...base,plugins:{legend:{display:true,labels:{color:'#5a5a72',font:{size:9,family:'DM Mono'},boxWidth:10}}}}});
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // WEEKLY
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 function renderWeekly(){
   const rows = monthRows();
   renderKPIs('weekly-kpis', sumRows(rows), rows.length);
   const weeks=[[],[],[],[],[]];
   rows.forEach(r=>{ const d=parseInt(r.date.slice(8)); weeks[d<=7?0:d<=14?1:d<=21?2:d<=28?3:4].push(r); });
   const [y,m]=activeMonth.split('-');
-  const wlabels=[`01â07`,`08â14`,`15â21`,`22â28`,`29â31`];
+  const wlabels=[`01–07`,`08–14`,`15–21`,`22–28`,`29–31`];
   document.getElementById('weekly-grid').innerHTML=weeks.map((wr,i)=>{
-    if('wr.length) return '';
+    if(!wr.length) return '';
     const ws=sumRows(wr);
     const rc=ws.roas===null?'':ws.roas>=3?'g':ws.roas>=1.5?'y':'r';
     return `<div class="week-card">
       <div class="week-hd">Semana ${i+1} <span class="week-tag">${wlabels[i]}/${m}</span></div>
       <div class="wrow"><span class="wl">Investimento</span><span>R$ ${ws.inv.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
       <div class="wrow"><span class="wl">Leads FB</span><span>${ws.leads}</span></div>
-      <div class="wrow"><span class="wl">CPL</span><span>${ws.cpl?'R$ '+ws.cpl.toFixed(2):'â'}</span></div>
+      <div class="wrow"><span class="wl">CPL</span><span>${ws.cpl?'R$ '+ws.cpl.toFixed(2):'—'}</span></div>
       <div class="wrow"><span class="wl">Leads CRM</span><span>${ws.crm}</span></div>
       <div class="wrow"><span class="wl">R. Fechamento</span><span>${ws.rfech}</span></div>
       <div class="wrow"><span class="wl">Vendas</span><span class="g">${ws.vendas}</span></div>
       <div class="wrow"><span class="wl">Valor Vendido</span><span class="g">R$ ${ws.vv.toLocaleString('pt-BR',{minimumFractionDigits:0})}</span></div>
-      <div class="wrow"><span class="wl">Ticket MÃ©dio</span><span>${ws.ticket?'R$ '+ws.ticket.toLocaleString('pt-BR',{minimumFractionDigits:0}):'â'}</span></div>
-      <div class="wrow"><span class="wl">ROAS</span><span class="${rc}">${ws.roas?ws.roas.toFixed(2)+'x':'â'}</span></div>
-      <div class="wrow"><span class="wl">CAC</span><span>${ws.cac?'R$ '+ws.cac.toLocaleString('pt-BR',{minimumFractionDigits:0}):'â'}</span></div>
+      <div class="wrow"><span class="wl">Ticket Médio</span><span>${ws.ticket?'R$ '+ws.ticket.toLocaleString('pt-BR',{minimumFractionDigits:0}):'—'}</span></div>
+      <div class="wrow"><span class="wl">ROAS</span><span class="${rc}">${ws.roas?ws.roas.toFixed(2)+'x':'—'}</span></div>
+      <div class="wrow"><span class="wl">CAC</span><span>${ws.cac?'R$ '+ws.cac.toLocaleString('pt-BR',{minimumFractionDigits:0}):'—'}</span></div>
     </div>`;
   }).join('');
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // MONTHLY
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 function renderMonthly(){
   const all=Object.entries(MONTHS).map(([k,v])=>{
     const rows=monthRows(k); const s=sumRows(rows);
     return {key:k,label:v,...s};
-  }).filter(m=>m.dias>0||m.inv>0);
+  }).filter(m=>m.dias>0||m.inv:0);
   const totInv=all.reduce((s,m)=>s+m.inv,0), totLeads=all.reduce((s,m)=>s+m.leads,0),
         totVendas=all.reduce((s,m)=>s+m.vendas,0), totVV=all.reduce((s,m)=>s+m.vv,0);
   renderKPIs('monthly-kpis',{inv:totInv,leads:totLeads,crm:0,rfech:0,vendas:totVendas,vv:totVV,
-    cpl:totLeads?totInv/totLeads:null,roas:totInv?totVV/totInv:null,cac:totVendas?totInv/totVendas:null,
+    cpl:totLeads?totInv/totLeads:null,roas:totInv?totVV/totInv:null,cac:totVendas:totInv/totVendas:null,
     tc:null,ticket:totVendas?totVV/totVendas:null,taxa:null},all.length);
   const labels=all.map(m=>m.label), roasArr=all.map(m=>m.roas||0), vvArr=all.map(m=>m.vv||0);
   const co={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
@@ -790,26 +1055,26 @@ function renderMonthly(){
     const cur=m.key===activeMonth;
     const rc=m.roas===null?'inherit':m.roas>=3?'var(--green)':m.roas>=1.5?'var(--yellow)':'var(--red)';
     return `<div class="mc">
-      <div class="mc-hd"><div class="mc-name">${m.label}</div><span class="mc-tag ${cur?'cur':'done'}">${cur?'â em curso':'concluÃ­do'}</span></div>
-      <div class="mstat"><span>Investimento</span><span>R$ ${m.inv.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+      <div class="mc-hd"><div class="mc-name">${m.label}</div><span class="mc-tag ${cur?'cur':'done'}">${cur?'● em curso':'concluído'}</span></div>
+      <div class="mstat"><span>Investimento</span><span>R$ ${m.inv toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
       <div class="mstat"><span>Leads FB</span><span>${m.leads}</span></div>
-      <div class="mstat"><span>CPL</span><span>${m.cpl?'R$ '+m.cpl.toFixed(2):'â'}</span></div>
+      <div class="mstat"><span>CPL</span><span>${m.cpl?'R$ '+m.cpl.toFixed(2):'—'}</span></div>
       <div class="mstat"><span>Vendas</span><span style="color:var(--green)">${m.vendas}</span></div>
       <div class="mstat"><span>Valor Vendido</span><span style="color:var(--green)">R$ ${m.vv.toLocaleString('pt-BR',{minimumFractionDigits:0})}</span></div>
-      <div class="mstat"><span>Ticket MÃ©dio</span><span>${m.ticket?'R$ '+m.ticket.toLocaleString('pt-BR',{minimumFractionDigits:0}):'â'}</span></div>
-      <div class="mstat"><span>ROAS</span><span style="color:${rc}">${m.roas?m.roas.toFixed(2)+'x':'â'}</span></div>
-      <div class="mstat"><span>CAC</span><span>${m.cac?'R$ '+m.cac.toLocaleString('pt-BR',{minimumFractionDigits:0}):'â'}</span></div>
+      <div class="mstat"><span>Ticket Médio</span><span>${m.ticket?'R$ '+m.ticket.toLocaleString('pt-BR',{minimumFractionDigits:0}):'—'}</span></div>
+      <div class="mstat"><span>ROAS</span><span style="color:${rc}">${m.roas?m.roas.toFixed(2)+'x':'—'}</span></div>
+      <div class="mstat"><span>CAC</span><span>${m.cac?'R$ '+m.cac.toLocaleString('pt-BR',{minimumFractionDigits:0}):'—'}</span></div>
     </div>`;
   }).join('');
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // MODAL
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 function openAddModal(date){
   editDate=date||null;
   const t=date||todayISO();
-  document.getElementById('modal-title').textContent=date?'Editar '+date:'LanÃ§ar dia';
+  document.getElementById('modal-title').textContent=date?'Editar '+date:'Lançar dia';
   document.getElementById('modal-sub').textContent=date?'Atualize os valores':'Insira os dados do dia';
   document.getElementById('f-date').value=t;
   // determine month from date
@@ -845,17 +1110,17 @@ async function saveModal(){
   closeModal();
   renderAll(); buildSidebar();
   await pushRow(mk, row);
-  toast('Dia '+date+' salvo â','ok');
+  toast('Dia '+date+' salvo ✓','ok');
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // SIDEBAR & NAV
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 function buildSidebar(){
   document.getElementById('month-nav').innerHTML=
     Object.entries(MONTHS).reverse().map(([k,v])=>`
       <div class="nav-item ${k===activeMonth?'active':''}" onclick="setActiveMonth('${k}')">
-        <span class="ico">â¦</span>${v}
+        <span class="ico">◦</span>${v}
         <span class="badge">${(DB[k]||[]).length}d</span>
       </div>`).join('');
 }
@@ -874,18 +1139,18 @@ function setActiveMonth(mk){
 
 function showPage(p, el){
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(x=>{ if(['DiÃ¡rio','Semanal','Mensal'].some(t=>x.textContent.includes(t))) x.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(x=>{ if(['Diário','Semanal','Mensal'].some(t=>x.textContent.includes(t))) x.classList.remove('active'); });
   document.getElementById('page-'+p).classList.add('active');
   if(el) el.classList.add('active');
-  const titles={daily:'DiÃ¡rio',weekly:'Semanal',monthly:'Mensal'};
+  const titles={daily:'Diário',weekly:'Semanal',monthly:'Mensal'};
   document.getElementById('page-title').innerHTML=titles[p]+' <span id="active-month-label">'+MONTHS[activeMonth]+'</span>';
   if(p==='weekly') renderWeekly();
   if(p==='monthly') renderMonthly();
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // EXPORT
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 function exportCSV(){
   const rows=[];
   Object.entries(DB).sort().forEach(([mk,arr])=>{
@@ -898,12 +1163,12 @@ function exportCSV(){
   const blob=new Blob([hdr+'\n'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download='sapiens_leads_'+todayISO()+'.csv';a.click();
-  toast('CSV exportado â','ok');
+  toast('CSV exportado ✓','ok');
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 // UI HELPERS
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════
 function setStatus(type, msg){
   const pill=document.getElementById('status-pill');
   const txt=document.getElementById('status-text');
