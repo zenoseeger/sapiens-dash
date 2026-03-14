@@ -919,7 +919,7 @@ function renderAll(){
 function renderKPIs(id, s, dias){
   const rc = s.roas===null?'var(--muted)':s.roas>=3?'var(--green)':s.roas>=1.5?'var(--yellow)':'var(--red)';
   document.getElementById(id).innerHTML=[
-    {l:'Investimento', v:'R$ '+s.inv toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}), sub:dias+' dias', c:'var(--a)'},
+    {l:'Investimento', v:'R$ '+s.inv.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}), sub:dias+' dias', c:'var(--a)'},
     {l:'Leads FB',     v:s.leads, sub:s.cpl?'CPL R$ '+s.cpl.toFixed(2):'—', c:'var(--blue)'},
     {l:'Leads CRM',    v:s.crm,   sub:s.taxa?'Taxa '+fmtPct(s.taxa):'—', c:'#a78bfa'},
     {l:'Vendas',       v:s.vendas,sub:s.ticket?'Ticket R$ '+s.ticket.toLocaleString('pt-BR',{minimumFractionDigits:0}):'—', c:'var(--yellow)'},
@@ -1039,7 +1039,7 @@ function renderMonthly(){
   const totInv=all.reduce((s,m)=>s+m.inv,0), totLeads=all.reduce((s,m)=>s+m.leads,0),
         totVendas=all.reduce((s,m)=>s+m.vendas,0), totVV=all.reduce((s,m)=>s+m.vv,0);
   renderKPIs('monthly-kpis',{inv:totInv,leads:totLeads,crm:0,rfech:0,vendas:totVendas,vv:totVV,
-    cpl:totLeads?totInv/totLeads:null,roas:totInv?totVV/totInv:null,cac:totVendas:totInv/totVendas:null,
+    cpl:totLeads?totInv/totLeads:null,roas:totInv?totVV/totInv:null,cac:totVendas?totInv/totVendas:null,
     tc:null,ticket:totVendas?totVV/totVendas:null,taxa:null},all.length);
   const labels=all.map(m=>m.label), roasArr=all.map(m=>m.roas||0), vvArr=all.map(m=>m.vv||0);
   const co={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
@@ -1056,7 +1056,7 @@ function renderMonthly(){
     const rc=m.roas===null?'inherit':m.roas>=3?'var(--green)':m.roas>=1.5?'var(--yellow)':'var(--red)';
     return `<div class="mc">
       <div class="mc-hd"><div class="mc-name">${m.label}</div><span class="mc-tag ${cur?'cur':'done'}">${cur?'● em curso':'concluído'}</span></div>
-      <div class="mstat"><span>Investimento</span><span>R$ ${m.inv toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+      <div class="mstat"><span>Investimento</span><span>R$ ${m.inv.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
       <div class="mstat"><span>Leads FB</span><span>${m.leads}</span></div>
       <div class="mstat"><span>CPL</span><span>${m.cpl?'R$ '+m.cpl.toFixed(2):'—'}</span></div>
       <div class="mstat"><span>Vendas</span><span style="color:var(--green)">${m.vendas}</span></div>
